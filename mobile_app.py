@@ -644,8 +644,14 @@ with tab2:
 
         if is_open:
             with st.container():
-                # 이름 수정
-                with st.expander("✏️ 정보 수정"):
+                # 이름 수정 (expander 대신 버튼 토글)
+                edit_key = f"edit_open_{name}"
+                if st.button("✏️ 정보 수정 열기" if not st.session_state.get(edit_key) else "정보 수정 닫기",
+                             key=f"edit_toggle_{name}", use_container_width=True):
+                    st.session_state[edit_key] = not st.session_state.get(edit_key, False)
+                    st.rerun()
+
+                if st.session_state.get(edit_key):
                     ec1, ec2 = st.columns(2)
                     with ec1:
                         e_name  = st.text_input("이름", value=name, key=f"en_{name}")
@@ -663,6 +669,7 @@ with tab2:
                             df_stu2.at[idx[0], '메모']    = e_note.strip()
                             if safe_write(df_stu2, SHEET_STU):
                                 st.session_state['mgmt_open'] = None
+                                st.session_state[edit_key] = False
                                 st.success("저장 완료!")
                                 st.rerun()
 
