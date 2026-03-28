@@ -110,9 +110,9 @@ st.markdown("""
 .stSelectbox>div>div { border-radius:10px!important; min-height:44px!important; font-size:13px!important; }
 .stTextArea textarea { font-size:13px!important; border-radius:12px!important; }
 
-/* 달력 버튼 (작게) */
+/* 달력·필터 버튼 (가로 배치) */
 [data-testid="stHorizontalBlock"] .stButton>button {
-    padding:2px 0!important; min-height:36px!important; font-size:12px!important;
+    padding:2px 0!important; min-height:36px!important; font-size:11px!important;
     border-radius:8px!important;
 }
 hr { margin:8px 0!important; border-color:#e5e7eb!important; }
@@ -247,53 +247,77 @@ CUR_IDX    = MONTH_OPTS.index(CUR_MK) if CUR_MK in MONTH_OPTS else 0
 ml = lambda mk: f"{mk[:4]}년 {int(mk[5:])}월"
 
 # ─────────────────────────────────────────────────────────────────────────────
+#  날씨 아이콘 (1시간 캐시)
+# ─────────────────────────────────────────────────────────────────────────────
+@st.cache_data(ttl=3600, show_spinner=False)
+def _weather_icon() -> str:
+    try:
+        import urllib.request
+        with urllib.request.urlopen("https://wttr.in/Seoul?format=%c", timeout=3) as r:
+            return r.read().decode('utf-8').strip()
+    except Exception:
+        m = datetime.date.today().month
+        if m in (12, 1, 2): return "❄️"
+        if m in (3, 4, 5):  return "🌸"
+        if m in (6, 7, 8):  return "☀️"
+        return "🍂"
+
+# ─────────────────────────────────────────────────────────────────────────────
 #  일일 명언 (날짜 기반 순환)
 # ─────────────────────────────────────────────────────────────────────────────
 _QUOTES = [
-    "이것 또한\n지나갈 것이다",
-    "아이들은\n기다려줄 때 자란다",
-    "인내는\n쓰고 열매는 달다",
-    "작은 진보도\n진보다",
-    "오늘 심은 씨앗이\n내일의 꽃이 된다",
-    "천천히 가도\n방향이 맞으면 된다",
-    "지금 이 순간이\n가장 중요하다",
-    "포기하지 않는 것이\n재능이다",
-    "가르침은\n두 번 배우는 것이다",
-    "모든 아이는\n각자의 속도가 있다",
-    "웃음은\n최고의 교육법이다",
-    "어제보다\n나은 오늘이면 충분하다",
-    "힘든 날도\n내일은 다시 시작된다",
-    "꾸준함이\n재능을 이긴다",
-    "한 걸음씩\n나아가면 된다",
-    "기다림도\n사랑의 한 형태다",
-    "실수는\n성장의 재료다",
-    "침착함은\n최고의 무기다",
-    "긍정은\n전염된다",
-    "매일이\n새로운 기회다",
-    "작은 성공을\n크게 축하하라",
-    "평온한 마음이\n지혜를 낳는다",
-    "어려울수록\n더 단단해진다",
-    "오늘의 노력이\n기억된다",
-    "변화는\n느리지만 온다",
-    "진심은\n반드시 닿는다",
-    "갈등은\n이해의 시작이다",
-    "쉬어가는 것도\n용기다",
-    "모든 과정에는\n의미가 있다",
-    "좋은 선생님은\n평생 기억된다",
+    ("이것 또한 지나갈 것이다", "페르시아 속담"),
+    ("아이들은 기다려줄 때 자란다", "마리아 몬테소리"),
+    ("인내는 쓰고 열매는 달다", "장 자크 루소"),
+    ("작은 진보도 진보다", "아리스토텔레스"),
+    ("오늘 심은 씨앗이 내일의 꽃이 된다", "중국 속담"),
+    ("천천히 가도 방향이 맞으면 된다", "마하트마 간디"),
+    ("지금 이 순간이 가장 중요하다", "레프 톨스토이"),
+    ("포기하지 않는 것이 재능이다", "헨리 포드"),
+    ("가르침은 두 번 배우는 것이다", "조셉 주베르"),
+    ("모든 아이는 각자의 속도가 있다", "존 듀이"),
+    ("웃음은 최고의 교육법이다", "윌리엄 A. 워드"),
+    ("어제보다 나은 오늘이면 충분하다", "랄프 에머슨"),
+    ("힘든 날도 내일은 다시 시작된다", "헬렌 켈러"),
+    ("꾸준함이 재능을 이긴다", "윈스턴 처칠"),
+    ("한 걸음씩 나아가면 된다", "마틴 루터 킹"),
+    ("기다림도 사랑의 한 형태다", "파울로 코엘료"),
+    ("실수는 성장의 재료다", "존 듀이"),
+    ("침착함은 최고의 무기다", "마르쿠스 아우렐리우스"),
+    ("긍정은 전염된다", "노먼 V. 필"),
+    ("매일이 새로운 기회다", "B.C. 포브스"),
+    ("작은 성공을 크게 축하하라", "피터 드러커"),
+    ("평온한 마음이 지혜를 낳는다", "부처"),
+    ("어려울수록 더 단단해진다", "니체"),
+    ("오늘의 노력이 기억된다", "오프라 윈프리"),
+    ("변화는 느리지만 온다", "넬슨 만델라"),
+    ("진심은 반드시 닿는다", "공자"),
+    ("갈등은 이해의 시작이다", "칼 융"),
+    ("쉬어가는 것도 용기다", "버트런드 러셀"),
+    ("모든 과정에는 의미가 있다", "빅터 프랭클"),
+    ("좋은 선생님은 평생 기억된다", "헨리 아담스"),
 ]
-_today_quote = _QUOTES[datetime.date.today().timetuple().tm_yday % len(_QUOTES)]
+_q, _a = _QUOTES[datetime.date.today().timetuple().tm_yday % len(_QUOTES)]
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  앱 헤더
 # ─────────────────────────────────────────────────────────────────────────────
+_weekdays = ['월', '화', '수', '목', '금', '토', '일']
+_today = datetime.date.today()
+_date_str = f"{_today.strftime('%Y년 %m월 %d일')} ({_weekdays[_today.weekday()]})"
+_wicon = _weather_icon()
+
 st.markdown(f"""
 <div class="app-hdr">
-  <div style="font-size:26px">🎨</div>
+  <div style="font-size:26px">{_wicon}</div>
   <div style="flex:1">
     <div class="app-hdr-title">아트앤하트 출석부</div>
-    <div class="app-hdr-sub">{datetime.date.today().strftime('%Y년 %m월 %d일')}</div>
+    <div class="app-hdr-sub">{_date_str}</div>
   </div>
-  <div class="app-hdr-quote">"{_today_quote.replace(chr(10), '<br>')}"</div>
+  <div class="app-hdr-quote">
+    &ldquo;{_q}&rdquo;<br>
+    <span style="font-size:9px;opacity:.7">— {_a}</span>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -393,9 +417,9 @@ def render_schedule_calendar(name: str, df_sched: pd.DataFrame):
     month = st.session_state[m_key]
 
     # ── 월 이동 ──
-    c1, c2, c3 = st.columns([1, 2.5, 1])
+    c1, c2, c3 = st.columns([1.3, 2.4, 1.3])
     with c1:
-        if st.button("◀", key=f"prev_{name}"):
+        if st.button("◀ 이전", key=f"prev_{name}", use_container_width=True):
             if month == 1:
                 st.session_state[y_key] -= 1; st.session_state[m_key] = 12
             else:
@@ -404,7 +428,7 @@ def render_schedule_calendar(name: str, df_sched: pd.DataFrame):
     with c2:
         st.markdown(f"<div class='cal-hdr'>{year}년 {month}월</div>", unsafe_allow_html=True)
     with c3:
-        if st.button("▶", key=f"next_{name}"):
+        if st.button("다음 ▶", key=f"next_{name}", use_container_width=True):
             if month == 12:
                 st.session_state[y_key] += 1; st.session_state[m_key] = 1
             else:
@@ -889,7 +913,7 @@ with tab4:
         cur_stg  = str(pro_row.iloc[0]['진행단계']) if not pro_row.empty else ''
         cur_upd  = str(pro_row.iloc[0]['최종수정일']) if not pro_row.empty else ''
 
-        c1, c2 = st.columns([4, 1])
+        c1, c2 = st.columns([3.2, 1.3])
         with c1:
             proj_preview = f'<div class="s-note">{cur_proj[:30]}{"…" if len(cur_proj)>30 else ""}</div>' if cur_proj and cur_proj != 'nan' else ''
             st.markdown(f"""
@@ -899,7 +923,8 @@ with tab4:
               {proj_preview}
             </div>""", unsafe_allow_html=True)
         with c2:
-            if st.button("닫기" if is_open else "편집", key=f"pro_{name}"):
+            if st.button("닫기" if is_open else "편집", key=f"pro_{name}",
+                         use_container_width=True):
                 st.session_state['prog_open'] = None if is_open else name
                 # 사진 초기화 (첫 오픈 시)
                 if not is_open:
