@@ -253,7 +253,7 @@ ml = lambda mk: f"{mk[:4]}년 {int(mk[5:])}월"
 def _weather_icon() -> str:
     try:
         import urllib.request
-        with urllib.request.urlopen("https://wttr.in/Seoul?format=%c", timeout=3) as r:
+        with urllib.request.urlopen("https://wttr.in/Jangpyeong-dong,Geoje?format=%c", timeout=3) as r:
             return r.read().decode('utf-8').strip()
     except Exception:
         m = datetime.date.today().month
