@@ -63,13 +63,19 @@ st.markdown("""
 .stTabs [aria-selected="true"] { color:#6366f1; border-bottom-color:#6366f1; background:#f8f7ff; }
 .stTabs [data-baseweb="tab-panel"] { padding:12px 0 0 0; }
 
+/* 전체 요소 간격 축소 */
+[data-testid="stVerticalBlock"] { gap:0.3rem!important; }
+[data-testid="stVerticalBlockBorderWrapper"] { padding:0!important; }
+.element-container { margin-bottom:0!important; }
+[data-testid="stForm"] { padding:0!important; border:none!important; }
+
 /* 섹션 헤더 */
 .sec { font-size:13px; font-weight:800; color:#374151;
-       margin:14px 0 8px; padding-bottom:5px; border-bottom:1.5px solid #e5e7eb; }
+       margin:8px 0 4px; padding-bottom:4px; border-bottom:1.5px solid #e5e7eb; }
 
 /* 카드 */
-.card { background:#fff; border-radius:14px; padding:12px 14px;
-        margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
+.card { background:#fff; border-radius:14px; padding:10px 14px;
+        margin-bottom:4px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
 .s-name  { font-size:15px; font-weight:800; color:#1e293b; }
 .s-class { font-size:12px; color:#64748b; margin-top:1px; }
 .s-note  { font-size:11px; color:#94a3b8; margin-top:1px; }
@@ -115,7 +121,13 @@ st.markdown("""
     padding:2px 0!important; min-height:36px!important; font-size:12px!important;
     border-radius:8px!important;
 }
-hr { margin:12px 0!important; border-color:#e5e7eb!important; }
+hr { margin:6px 0!important; border-color:#e5e7eb!important; }
+
+/* 원생관리 버튼 크기 */
+.mgmt-btn .stButton>button {
+    min-height:52px!important; font-size:14px!important;
+    padding:4px 8px!important; border-radius:12px!important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -627,7 +639,7 @@ with tab2:
         is_open = st.session_state['mgmt_open'] == name
         has_schedule = name in names_with_sched2
 
-        c1, c2 = st.columns([4, 1])
+        c1, c2 = st.columns([3.2, 1.3])
         with c1:
             note_line = f'<div class="s-note">{s["메모"]}</div>' if s['메모'] else ''
             st.markdown(f"""
@@ -638,7 +650,7 @@ with tab2:
             </div>""", unsafe_allow_html=True)
         with c2:
             btn_lbl = "닫기" if is_open else ("수정" if has_schedule else "일정")
-            if st.button(btn_lbl, key=f"mgmt_{name}"):
+            if st.button(btn_lbl, key=f"mgmt_{name}", use_container_width=True):
                 st.session_state['mgmt_open'] = None if is_open else name
                 st.rerun()
 
