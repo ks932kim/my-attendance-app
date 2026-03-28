@@ -40,7 +40,7 @@ st.markdown("""
 #MainMenu,[data-testid="stStatusWidget"] { display:none!important; }
 
 [data-testid="stAppViewContainer"] { background:#f0f2f8; }
-.block-container { padding:0 .75rem 3rem .75rem!important; max-width:480px!important; margin:0 auto!important; }
+.block-container { padding:0 .4rem 3rem .4rem!important; max-width:480px!important; margin:0 auto!important; }
 
 /* 앱 헤더 */
 .app-hdr {
@@ -112,8 +112,13 @@ st.markdown("""
 
 /* 달력·필터 버튼 (가로 배치) */
 [data-testid="stHorizontalBlock"] .stButton>button {
-    padding:2px 0!important; min-height:36px!important; font-size:11px!important;
-    border-radius:8px!important;
+    padding:0 1px!important; min-height:34px!important; font-size:11px!important;
+    border-radius:6px!important; min-width:0!important; width:100%!important;
+}
+/* 달력 7열 버튼 - 모바일 최적화 */
+[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) .stButton>button {
+    font-size:10px!important; min-height:30px!important;
+    padding:0!important; border-radius:5px!important;
 }
 hr { margin:8px 0!important; border-color:#e5e7eb!important; }
 
