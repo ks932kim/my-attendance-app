@@ -295,8 +295,7 @@ if not _is_authenticated():
     """, unsafe_allow_html=True)
 
     pw_input = st.text_input("비밀번호", type="password",
-                             placeholder="비밀번호 입력",
-                             label_visibility="collapsed")
+                             placeholder="비밀번호 6자리 입력")
     if st.button("입장", type="primary", use_container_width=True):
         correct = st.secrets.get("app_password", "")
         if pw_input == correct:
