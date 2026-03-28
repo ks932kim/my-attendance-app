@@ -63,19 +63,13 @@ st.markdown("""
 .stTabs [aria-selected="true"] { color:#6366f1; border-bottom-color:#6366f1; background:#f8f7ff; }
 .stTabs [data-baseweb="tab-panel"] { padding:12px 0 0 0; }
 
-/* 전체 요소 간격 축소 */
-[data-testid="stVerticalBlock"] { gap:0.3rem!important; }
-[data-testid="stVerticalBlockBorderWrapper"] { padding:0!important; }
-.element-container { margin-bottom:0!important; }
-[data-testid="stForm"] { padding:0!important; border:none!important; }
-
 /* 섹션 헤더 */
 .sec { font-size:13px; font-weight:800; color:#374151;
-       margin:8px 0 4px; padding-bottom:4px; border-bottom:1.5px solid #e5e7eb; }
+       margin:10px 0 6px; padding-bottom:4px; border-bottom:1.5px solid #e5e7eb; }
 
 /* 카드 */
 .card { background:#fff; border-radius:14px; padding:10px 14px;
-        margin-bottom:4px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
+        margin-bottom:6px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
 .s-name  { font-size:15px; font-weight:800; color:#1e293b; }
 .s-class { font-size:12px; color:#64748b; margin-top:1px; }
 .s-note  { font-size:11px; color:#94a3b8; margin-top:1px; }
@@ -121,12 +115,12 @@ st.markdown("""
     padding:2px 0!important; min-height:36px!important; font-size:12px!important;
     border-radius:8px!important;
 }
-hr { margin:6px 0!important; border-color:#e5e7eb!important; }
+hr { margin:8px 0!important; border-color:#e5e7eb!important; }
 
-/* 원생관리 버튼 크기 */
-.mgmt-btn .stButton>button {
-    min-height:52px!important; font-size:14px!important;
-    padding:4px 8px!important; border-radius:12px!important;
+/* 헤더 명언 */
+.app-hdr-quote {
+    font-size:10px; opacity:.85; font-style:italic;
+    text-align:right; line-height:1.4; max-width:160px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -252,6 +246,42 @@ CUR_MK     = datetime.date.today().strftime('%Y-%m')
 CUR_IDX    = MONTH_OPTS.index(CUR_MK) if CUR_MK in MONTH_OPTS else 0
 ml = lambda mk: f"{mk[:4]}년 {int(mk[5:])}월"
 
+# ─────────────────────────────────────────────────────────────────────────────
+#  일일 명언 (날짜 기반 순환)
+# ─────────────────────────────────────────────────────────────────────────────
+_QUOTES = [
+    "이것 또한\n지나갈 것이다",
+    "아이들은\n기다려줄 때 자란다",
+    "인내는\n쓰고 열매는 달다",
+    "작은 진보도\n진보다",
+    "오늘 심은 씨앗이\n내일의 꽃이 된다",
+    "천천히 가도\n방향이 맞으면 된다",
+    "지금 이 순간이\n가장 중요하다",
+    "포기하지 않는 것이\n재능이다",
+    "가르침은\n두 번 배우는 것이다",
+    "모든 아이는\n각자의 속도가 있다",
+    "웃음은\n최고의 교육법이다",
+    "어제보다\n나은 오늘이면 충분하다",
+    "힘든 날도\n내일은 다시 시작된다",
+    "꾸준함이\n재능을 이긴다",
+    "한 걸음씩\n나아가면 된다",
+    "기다림도\n사랑의 한 형태다",
+    "실수는\n성장의 재료다",
+    "침착함은\n최고의 무기다",
+    "긍정은\n전염된다",
+    "매일이\n새로운 기회다",
+    "작은 성공을\n크게 축하하라",
+    "평온한 마음이\n지혜를 낳는다",
+    "어려울수록\n더 단단해진다",
+    "오늘의 노력이\n기억된다",
+    "변화는\n느리지만 온다",
+    "진심은\n반드시 닿는다",
+    "갈등은\n이해의 시작이다",
+    "쉬어가는 것도\n용기다",
+    "모든 과정에는\n의미가 있다",
+    "좋은 선생님은\n평생 기억된다",
+]
+_today_quote = _QUOTES[datetime.date.today().timetuple().tm_yday % len(_QUOTES)]
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  앱 헤더
@@ -259,10 +289,11 @@ ml = lambda mk: f"{mk[:4]}년 {int(mk[5:])}월"
 st.markdown(f"""
 <div class="app-hdr">
   <div style="font-size:26px">🎨</div>
-  <div>
+  <div style="flex:1">
     <div class="app-hdr-title">아트앤하트 출석부</div>
     <div class="app-hdr-sub">{datetime.date.today().strftime('%Y년 %m월 %d일')}</div>
   </div>
+  <div class="app-hdr-quote">"{_today_quote.replace(chr(10), '<br>')}"</div>
 </div>
 """, unsafe_allow_html=True)
 
